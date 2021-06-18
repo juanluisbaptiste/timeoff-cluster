@@ -9,6 +9,24 @@ The application is deployed on a docker swarm cluster on AWS. Swarm was selected
 * [timeoff management application](https://github.com/juanluisbaptiste/timeoff-management-application) fork
 * [timeoff cluster](https://github.com/juanluisbaptiste/timeoff-cluster) (this repo)
 
+
+## Description of the Work Done
+
+The swarm cluster uses a single manager node with multiple workers that handle the cluster workload. Cluster nodes are deployed on different Availability Zones to increase availability. The EFS filesystem is multi AZ and is available on all nodes.
+
+The decision to use a single manager node was to simplify the deployment and concentrate of the use of the technologies mentioned on this document. The last section deals with improvements that could be applied to this architecture to improve it in many aspects.
+
+### Architecture
+
+The following diagram depicts the selected architecture:
+
+<p align="center">
+
+  <img src="https://raw.githubusercontent.com/juanluisbaptiste/timeoff-cluster/master/img/architecture.png" alt="Architecture diagram">
+
+</p>
+
+Each of the components of this architecture are described in more detail bellow.
 ### Infrastructure as Code
 
 Terraform was selected to do the cloud provisioning in AWS. The terraform code is separated in three projects:
@@ -44,16 +62,12 @@ The application pipeline contains two jobs:
 * _Build docker image_: This job will create a new docker image with the updated application code and push it to docker hub pubblic registry.
 * _Deploy docker image_: This job will pull the new image from docker hub and redeploy the application. This job tasks run on the cluster manager node (all cluster administrative task are executed on manager nodes).
 
+The pipeline workflow is like this:
 
-### Architecture
+1. The developer commits and push a code update to the [timeoff management application fork](https://github.com/juanluisbaptiste/timeoff-management-application) that will trigger the drone.io pipeline.
+2. image build job will clone the [timeoff management application fork](https://github.com/juanluisbaptiste/timeoff-management-application), build the image and push it to docker hub using a native drone plugin.
+3. If the previous job is successfull the de deployment job will connect vía ssh and run the `deploy.sh` script. This script will pull the new image, remove the current deployed version of the application and redeploy the new version.
 
-The following diagram depicts the selected architecture:
-
-<p align="center">
-
-  <img src="https://raw.githubusercontent.com/juanluisbaptiste/timeoff-cluster/master/img/architecture.png" alt="Architecture diagram">
-
-</p>
 
 ## Further Work
 
@@ -98,3 +112,5 @@ After this the cluster will have an increased capcity that should help it manage
 For the monitoring of the cluster nodes two approaches are available. One would be to modify the `user_data` script in terraform code to install and configure the Zabbix agent so it auto registers with the server inmediately it is created. The second option would be to use an ansible playook to do the same as part of the escaling program steps.
 
 ### Database
+
+The timeoff application is using the development mode, this means that it uses sqlite as the database platform. On a produtcion mode a more robust database must be used, the application supports MySQL which can be deployed using an AWS RDS insntance. This service comes with many features geared to increase service availability. The service can be configured to have automatic storage scaling, vertical scaling, read replicas replicas and multi AZ deployments. It also has automatic backups using database snapshots.
