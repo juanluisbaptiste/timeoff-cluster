@@ -1,0 +1,32 @@
+---
+- name: "Provisioning docker infraestructure services for environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
+  hosts: docker_engine
+  become: yes
+  become_user: root
+  vars_files:
+    - vars/deploy_swarm.yml
+    - vars/deploy_infra.yml
+
+  tasks:
+    - name: Create traefik overlay network (traefik_proxy)
+      docker_network:
+        name: "traefik_proxy"
+        scope: swarm
+        driver: overlay
+        attachable: yes
+        state: present
+      when: inventory_hostname in groups[swarm_manager_group]
+      tags:
+        - create_traefik_network
+
+    - name: Install infrastructure services
+      include_role:
+        name: "{{ item }}"
+      vars:
+          config: "{{ item.config }}"
+      with_items: "{{ infra_services }}"
+      when: inventory_hostname in groups[swarm_manager_group]
+      tags:
+        - install_infra_services
+        - configure_traefik_service
+        - configure_portainer_service

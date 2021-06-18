@@ -1,0 +1,3 @@
+---
+efs_mount_dir: "/mnt/efs/web-{{ env }}"
+efs_tag_group: "efs-gorilla-{{ env }}"

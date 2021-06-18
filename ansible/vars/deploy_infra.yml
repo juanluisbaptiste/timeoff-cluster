@@ -1,0 +1,33 @@
+---
+service_state: "restarted"
+portainer_group: 'docker_swarm_manager'
+local_service_path: "files/compose/{{ service.type }}/{{ service.hostname }}"
+
+infra_services:
+  # - role: traefik
+  #   config:
+  #     hostname: traefik
+  #     project_name: infra-traefik
+  #     type: "infra"
+  #     state: "{{ service_state }}"
+  - role: portainer
+    config:
+      hostname: portainer
+      project_name: infra-portainer
+      type: "infra"
+      state: "{{ service_state }}"
+      fs_volumes:
+        - /var/compose/infra/portainer/volumes/data
+      service_configs: "{{ configs|default({}) }}"
+  # - role: drone
+  #   config:
+  #     hostname: drone
+  #     project_name: infra-drone
+  #     type: "infra"
+  #     state: "{{ service_state }}"
+  #     fs_volumes:
+  #       # - /mnt/efs/web-prod/infra/drone/volumes/drone
+  #       - /var/compose/infra/drone/volumes/drone
+docker_private_repo_auth: True
+# fs_volumes:
+#   - /var/compose/infra/portainer/volumes/data

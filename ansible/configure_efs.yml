@@ -1,0 +1,60 @@
+---
+- name: "Configure EFS access for cluster nodes for environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
+  hosts: docker_engine
+  become: yes
+  become_user: root
+  vars_files:
+    - vars/deploy_swarm.yml
+    - vars/configure_efs.yml
+    - vars/aws.yml
+
+  tasks:
+  - name: "Ensure mount directory exists: {{ efs_mount_dir }}"
+    file:
+      path: "{{ efs_mount_dir }}"
+      state: directory
+      mode: 0755
+      owner: "{{ ansible_ssh_user }}"
+
+  - name: "Ensure chown on the mounted volume to user: {{ ansible_ssh_user }}"
+    file:
+      path: '{{efs_mount_dir}}'
+      owner: '{{ansible_ssh_user}}'
+      group: 'root'
+      mode: '755'
+    tags:
+      - mount_efs
+
+  - name: Search for EFS with tag Group = "{{ efs_tag_group }}"
+    efs_info:
+      region: "{{ aws_region }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      aws_access_key: "{{ aws_access_key }}"
+      tags:
+        Group: "{{ efs_tag_group }}"
+    register: efs_ids_result
+
+  - name: Get current AZ from AWS.
+    uri:
+      url: http://169.254.169.254/latest/meta-data/placement/availability-zone
+      return_content: yes
+    register: aws_current_az
+
+  # - debug: "msg={{ efs_ids_result['efs'] }}"
+
+  - name: Ensure EFS volume is mounted.
+    mount:
+      name: "{{ efs_mount_dir }}"
+      src: "{{ aws_current_az.content }}.{{ efs_id.file_system_id }}.efs.{{ aws_region }}.amazonaws.com:/"
+      fstype: nfs4
+      opts: nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev
+      state: mounted
+    with_items: "{{ efs_ids_result['efs'] }}"
+    when: aws_current_az is defined
+    loop_control:
+      loop_var: efs_id
+
+  # Print the contents of the mount to the log.
+  # - command: "ls -lah {{ efs_mount_dir }}"
+  #   register: efs_contents
+  # - debug: var=efs_contents

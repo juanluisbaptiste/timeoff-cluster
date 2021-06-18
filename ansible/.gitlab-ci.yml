@@ -1,0 +1,33 @@
+variables:
+  DEPLOY_DIR: /home/gitlab-runner/deploy/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+  DEBUG: 1
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline" && $ENVIRONMENT'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $ENVIRONMENT'
+stages:
+  - provision
+
+provision_swarm_cluster:
+  stage: provision
+  image: live9/ansible
+  before_script:
+    - mkdir -p auth
+    - echo "$AWS_SSH_PRIVATE_KEY" > "auth/id_ssh"
+    - find . -type d -exec chmod 755 {} \;
+    - find . -type f -exec chmod 644 {} \;
+    - chmod 600 auth/id_ssh
+    - chmod 755 inventory/ec2.py
+    - ansible-galaxy install -r requirements.yml
+    - pip install -r requirements.txt
+  script:
+    - ansible-playbook -b -i ./inventory/${ENVIRONMENT} --extra-vars="env=${ENVIRONMENT}" deploy_swarm.yml
+    - ansible-playbook -b -i ./inventory/${ENVIRONMENT} --extra-vars="env=${ENVIRONMENT}" configure_nfs.yml
+    - ansible-playbook -b -i ./inventory/${ENVIRONMENT} --extra-vars="env=${ENVIRONMENT} gitlab_runner_registration_token=${CI_GITLAB_RUNNER_TOKEN}" deploy_gitlab-runner.yml
+    - ansible-playbook -b -i ./inventory/${ENVIRONMENT} --extra-vars="env=${ENVIRONMENT}" deploy_infra.yml
+  # only:
+  #   - master
+  tags:
+    - preprod
+    - docker
+    - karisma

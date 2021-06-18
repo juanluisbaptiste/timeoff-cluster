@@ -1,0 +1,31 @@
+---
+# - name: Get cluster monitor node No. 1 info
+#   docker_node_info:
+#     # self: true
+#     # We need to replace _ with - because the registered swarm node name is the
+#     # same node hostname, and _ is not allowed in the hostname.
+#     name: "{{ groups['cluster_monitor'][0] | replace('_','-') }}"
+#   register: nodes
+#   when: inventory_hostname in groups['docker_swarm_manager'][0]
+#   tags:
+#     - configure_drone_service
+#     - install_infra_services
+# - name: Assign label for drone install in cluster monitor node No. 1
+#   docker_node:
+#     hostname: "{{ nodes.nodes.0.ID }}"
+#     labels:
+#       monitor: "true"
+#     labels_state: merge
+#   when: inventory_hostname in groups['docker_swarm_manager'][0]
+#   tags:
+#     - configure_drone_service
+#     - install_infra_services
+
+- name: Deploy service
+  import_role:
+    name: docker-service
+  vars:
+    service: "{{ config }}"
+  tags:
+    - configure_drone_service
+    - install_infra_services

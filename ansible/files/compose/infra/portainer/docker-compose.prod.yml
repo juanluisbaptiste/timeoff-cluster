@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  agent:
+    image: portainer/agent
+    environment:
+      # REQUIRED: Should be equal to the service name prefixed by "tasks." when
+      # deployed inside an overlay network
+      AGENT_CLUSTER_ADDR: tasks.agent
+      AGENT_PORT: 9001
+      # LOG_LEVEL: debug
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - traefik_proxy
+    deploy:
+      mode: global
+#      endpoint_mode: dnsrr
+      placement:
+        constraints: [node.platform.os == linux]
+      update_config:
+        parallelism: 2
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+
+  portainer:
+      image: portainer/portainer-ce
+      deploy:
+        replicas: 1
+        # endpoint_mode: dnsrr
+        placement:
+          constraints:
+            - node.role == manager
+        update_config:
+          parallelism: 2
+          delay: 10s
+          order: start-first
+          failure_action: rollback
+        restart_policy:
+          condition: on-failure
+        labels:
+          - "traefik.enable=true"
+          - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+          - "traefik.http.routers.portainer.service=portainer"
+          - "traefik.http.routers.portainer.rule=Host(`portainer.juanbaptiste.tech`)"
+          - "traefik.http.routers.portainer.entrypoints=https"
+          - "traefik.http.routers.portainer.tls.certresolver=le"
+
+      #command: ["-H", "tcp://tasks.agent:9001", "--tlsskipverify", "--admin-password=$2y$05$Nnetxx5WCP1d44Jwq/dYy.YI6aamFyMYIrW2akzQ.6sh.6Gdch1Hi"]
+      command: ["-H", "tcp://tasks.agent:9001", "--tlsskipverify"]
+      # Use this if direct access to portainer dashboard is needed
+      # ports:
+      #  - "9000:9000"
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+        - /etc/timezone:/etc/timezone:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /var/compose/infra/portainer/volumes/data:/data
+      environment:
+        - TZ=America/Bogota
+      networks:
+        - traefik_proxy
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

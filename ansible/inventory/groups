@@ -1,0 +1,17 @@
+[tag_manager_docker_engine_true]
+[tag_worker_docker_engine_true]
+[tag_manager_gitlab_runner_true]
+
+[docker_engine:children]
+tag_manager_true
+tag_worker_true
+
+[docker_swarm_manager:children]
+tag_manager_true
+
+[docker_swarm_worker:children]
+tag_worker_true
+#swarm-02 swarm_labels='["worker", "docker", "foo", "bar"]'
+
+[gitlab_runner:children]
+tag_manager_true

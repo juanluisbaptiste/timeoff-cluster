@@ -1,0 +1,17 @@
+---
+  - name: atosatto.docker-swarm
+    src: https://github.com/juanluisbaptiste/ansible-dockerswarm.git
+    scm: git
+    version: master
+  - src: https://gitlab.com/live9/ansible/roles/docker-service.git
+    scm: git
+    version: jlb_new_ansible_provisioning
+  - src: https://gitlab.com/live9/ansible/roles/traefik.git
+    scm: git
+    version: jlb_new_ansible_provisioning
+  - src: https://gitlab.com/live9/ansible/roles/portainer.git
+    scm: git
+    version: jlb_new_ansible_provisioning
+  - src: https://gitlab.com/live9/ansible/roles/base.git
+    scm: git
+    version: jlb_new_ansible_provisioning

@@ -1,0 +1,72 @@
+version: '3.8'
+services:
+  drone:
+    image: 'drone/drone:1'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 2
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.drone.loadbalancer.server.port=80"
+        - "traefik.http.routers.drone.service=drone"
+        - "traefik.http.routers.drone.rule=Host(`ci.juanbaptiste.tech`)"
+        - "traefik.http.routers.drone.entrypoints=https"
+        - "traefik.http.routers.drone.tls.certresolver=le"
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+      - traefik_proxy
+    env_file:
+      - .env
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # - "/mnt/efs/web-prod/infra/drone/volumes/drone:/data"
+      - "/var/compose/infra/drone/volumes/drone:/data"
+      - '/etc/localtime:/etc/localtime:ro'
+
+  drone-agent-bb:
+    image: drone/agent:1
+    deploy:
+      replicas: 1
+      # endpoint_mode: dnsrr
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    networks:
+      - traefik_proxy
+    command: agent
+    restart: always
+    depends_on:
+      - drone-bb
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - '/etc/localtime:/etc/localtime:ro'
+    env_file:
+      - .env
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

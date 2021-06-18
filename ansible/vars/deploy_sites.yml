@@ -1,0 +1,7 @@
+---
+sites:
+  - hostname: timeoff
+    project_name: "timeoff"
+    registry_auth: yes
+    type: "sites"
+    state: "started"

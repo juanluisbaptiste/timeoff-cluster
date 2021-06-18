@@ -1,0 +1,32 @@
+---
+- name: "Copy configuration files for applications in environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
+  hosts: docker_swarm_manager
+  become: yes
+  become_user: root
+  vars_files:
+    - vars/deploy_swarm.yml
+    - vars/configure_efs.yml
+
+  tasks:
+  - name: "Ensure configuration directory exists: {{ efs_mount_dir }}/sites/timeoff/"
+    file:
+      path: "{{ efs_mount_dir }}/sites/timeoff/"
+      state: directory
+      mode: 0755
+      owner: "{{ ansible_ssh_user }}"
+
+  - name: Copy configuration files
+    copy:
+      src: files/timeoff/config
+      dest: "{{ efs_mount_dir }}/sites/timeoff/"
+      owner: "{{ ansible_ssh_user }}"
+      group: root
+      # mode: 0755
+
+  # - name: "Copy deploy.sh script to /home/{{ ansible_ssh_user  }}"
+  #   copy:
+  #     src: files/timeoff/deploy.sh
+  #     dest: "/home/{{ ansible_ssh_user }}/"
+  #     owner: "{{ ansible_ssh_user }}"
+  #     group: root
+  #     mode: 0755

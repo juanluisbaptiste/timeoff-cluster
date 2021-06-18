@@ -1,0 +1,6 @@
+---
+service_state: "stopped"
+manager_group: "{{ swarm_manager_group }}"
+# Este servicio solo se ejecuta en los managers
+worker_group: "{{ swarm_manager_group }}"
+compose_local_file_name: "docker-compose.yml"

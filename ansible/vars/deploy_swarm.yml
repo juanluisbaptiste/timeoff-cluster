@@ -1,0 +1,15 @@
+---
+env: "preprod"
+reboot_server: True
+swarm_manager_group: "docker_swarm_manager"
+swarm_worker_group: "docker_swarm_worker"
+compose_files_dir: "/var/compose/"
+docker_daemon_config:
+  log-opts:
+    max-size: "10m"
+    max-file: "5"
+hosts_file: "/etc/cloud/templates/hosts.debian.tmpl"
+extra_packages:
+  - git
+pip_extra_packages:
+  - boto3

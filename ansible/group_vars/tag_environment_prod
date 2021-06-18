@@ -1,0 +1,5 @@
+---
+ansible_ssh_common_args: '-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -i auth/id_ssh -W %h:%p -q admin@timeoff.juanbaptiste.tech -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"'
+ansible_user: "admin"
+ansible_ssh_private_key_file: "auth/id_ssh"
+aws_profile: jlb
