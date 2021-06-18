@@ -1,31 +1,27 @@
-Role Name
+Drone.io docker service
 =========
 
-A brief description of the role goes here.
+Ansible role to deploy [drone.io](https://www.drone.io/) CI/CD server and agents on a docker swarm cluster using [docker-service](https://gitlab.com/live9/ansible/roles/docker-service/-/tree/jlb_new_ansible_provisioning) role.
 
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Same variables defined by docker-service, this role pre-configure some of them.
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+* docker-service
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+    - name: Deploy Drone
+      include_role:
+        name: drone
+      vars:
+          service_state: "started"
 
 License
 -------
@@ -35,4 +31,5 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+* Juan Luis Baptiste < juan _at_ juanbaptiste _dot_ tech >
+* https://www.juanbaptiste.tech
