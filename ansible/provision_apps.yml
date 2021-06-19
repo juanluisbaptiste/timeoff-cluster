@@ -19,8 +19,9 @@
     copy:
       src: files/timeoff/config
       dest: "{{ efs_mount_dir }}/sites/timeoff/"
-      owner: "{{ ansible_ssh_user }}"
-      group: root
+      # owner: "{{ ansible_ssh_user }}"
+      owner: 100
+      group: "{{ ansible_ssh_user }}"
       # mode: 0755
 
   # - name: "Copy deploy.sh script to /home/{{ ansible_ssh_user  }}"
