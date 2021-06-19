@@ -4,17 +4,28 @@ This repository contains the code to deploy the infrastructure needed to deploy 
 
 ## Introduction
 
-The application is deployed on a docker swarm cluster on AWS. Swarm was selected by its ease of use, configuration and administration. The cloud infrastructure is deployed using _Infrastructure as Code_ with terraform. For cloud provisioning Ansible was used, and  [drone.io](https://www.drone.io/) CI/CD was selected for the application deployment. All of the code is stored in the following github repositories:
+The application is deployed on a docker [swarm cluster](https://docs.docker.com/engine/swarm/) on AWS. Swarm was selected because of its simple installation and the ease of use and administration. The cloud infrastructure is deployed using _Infrastructure as Code_ with [terraform](https://www.terraform.io/). For cloud provisioning [Ansible](https://www.ansible.com/) was used, and  [drone.io](https://www.drone.io/) CI/CD was selected for the application deployment. 
+
+All of the code is stored in the following github repositories:
+
+Application and deploy files:
 
 * [timeoff management application](https://github.com/juanluisbaptiste/timeoff-management-application) fork
-* [timeoff cluster](https://github.com/juanluisbaptiste/timeoff-cluster) (this repo)
 
+Terraform and ansible code:
+
+* [timeoff cluster](https://github.com/juanluisbaptiste/timeoff-cluster) (this repo)
 
 ## Description of the Work Done
 
-The swarm cluster uses a single manager node with multiple workers that handle the cluster workload. Cluster nodes are deployed on different Availability Zones to increase availability. The EFS filesystem is multi AZ and is available on all nodes.
+The swarm cluster uses a single manager node with multiple workers that handle the cluster workload. All cluster nodes are deployed on different Availability Zones to increase availability. The EFS filesystem is multi AZ and it's available on all nodes. The decision to use a single manager node was to simplify the deployment and concentrate on the display of skills on the technologies asked by the challenge. The last section deals with improvements that could be applied to this architecture to improve it in many aspects.
 
-The decision to use a single manager node was to simplify the deployment and concentrate of the use of the technologies mentioned on this document. The last section deals with improvements that could be applied to this architecture to improve it in many aspects.
+When the infrastructure is up, the application and additional services are available at the following adresses:
+
+* Timeoff management application: https://timeoff.juanbaptiste.tech/
+* Drone.io CI/CD: https://ci.juanbaptiste.tech/
+* Traefik dashboard: https://traefik.juanbaptiste.tech/
+* Portainer dashboard: https://portainer.juanbaptiste.tech/
 
 ### Architecture
 
@@ -31,19 +42,19 @@ Each of the components of this architecture are described in more detail bellow.
 
 Terraform was selected to do the cloud provisioning in AWS. The terraform code is separated in three projects:
 
-* _elastic_ips_: this project will create an specified amount of elastic IP addresses to be associated with the managers of the swarm cluster.
-* _swarm_cluster_: this project will create a docker swarm cluster with an specified amount of manager and worker, and from an specified size (instance type) each.
-* _efs_: this project will create a shared EFS filesystem inside the cluster's VPC were the application code will reside and be shared among all the worker nodes of the cluster.
+* _[elastic_ips](https://github.com/juanluisbaptiste/timeoff-cluster/tree/master/terraform/elastic_ips)_: this project will create an specified amount of elastic IP addresses to be associated with the managers of the swarm cluster.
+* _[swarm_cluster](https://github.com/juanluisbaptiste/timeoff-cluster/tree/master/terraform/swarm_cluster)_: this project will create a docker swarm cluster with an specified amount of manager and worker, and from an specified size (instance type) each.
+* _[efs](https://github.com/juanluisbaptiste/timeoff-cluster/tree/master/terraform/efs)_: this project will create a shared EFS filesystem inside the cluster's VPC were the application code will reside and be shared among all the worker nodes of the cluster.
 
 All of the projects use custom terraform modules to do the work. For the documentation of module usage see its README.md file of each project. Projects must be launched in the same order as the preious list, first create the elastic IP addresses, then the cluster and lastly the EFS filesystem.
 
 ### Cluster Provisioning
 
-The Cluster provisioning is done using ansible. A set of playbooks and roles were writtento handle provisioning tasks that range from basic instance configuration to cluster installation.
+The Cluster provisioning is done using ansible. A set of playbooks and roles were written to handle provisioning tasks that range from basic instance configuration to cluster installation.
 
-For load balancing and access to the applications deployed in the cluster traefik was selected. This proxy/load balancer is deployed on the manager node(s) of the cluster and will balance the access to the deployed applications by a set of criterias configured using docker labels written on the `stack.yml` file of the application. The criterias can be by hostname, path or a combination of both. Additionally traefik is configured to secure the applications using SSL with Letsecrypt. It will take charge of the SSL certificate generation and updates for each deployed application.
+For load balancing and access to the applications deployed in the cluster [traefik](https://traefik.io/) was selected. This proxy/load balancer is deployed on the manager node(s) of the cluster and will balance the access to the deployed applications by a set of criteria configured using docker labels written on the `stack.yml` file of the application. The criteria can be by hostname, path or a combination of both. Additionally traefik is configured to secure the applications using SSL with Letsencrypt. Traefik will take charge of the SSL certificate generation and update for each deployed application.
 
-For cluster administration and debugging portainer was selected. This tool provides easy access to the containers running on the cluster, were tasks like reviewing of logs, console access or basic stats monitoring can be done. It also allows to do administrative tasks like manually redeployment of applications or increasing the amount of conatiner replicas.
+For cluster administration and debugging [portainer](https://www.portainer.io/) was selected. This tool provides easy access to the containers running on the cluster, were tasks like reviewing of logs, console access or basic stats monitoring can be accessed. It also allows to do administrative tasks like manually redeployment of services or increasing the amount of conatiner replicas.
 
 These are the ansible playbooks:
 
@@ -55,7 +66,7 @@ All of the playbooks have to be run in the same order as the previous list.
 
 ### Continious Integration & Deployment
 
-The docker image generation and application deployment in the cluster is done with drone.io. drone.io is an open source CI/CD platform that was written with the cloud in mind and it's very easy to use. Each application will have a `.drone.yml` file with the CI/CD pipeline that needs to be executed when updates to the application are pushed to the application's git repository.
+The docker image generation and application deployment in the cluster is done with drone.io. [drone.io](https://www.drone.io/) is an open source CI/CD platform that was written with the cloud in mind and it's very easy to use. Each application will have a `.drone.yml` file with the CI/CD pipeline that needs to be executed when updates to the application are pushed to the application's git repository.
 
 The application pipeline contains two jobs:
 
@@ -81,7 +92,7 @@ If the manager nodes amount is increased then some sort of load balancing needs 
 
 The second option would be to use one of those solutions, for this case a cloud based offering like the AWS application or network load balancers would make more sense. The load  balancer would be placed in front of the manager nodes so it can balance traffic between the local traefik on each node, using a health check to be notified when one of the nodes in the group becomes unavailable. When this happens the load balancer will stop sending traffic to the node until the health check reports that it is again available.
 
-### Auto escalaility
+### Auto Escalaility
 
 One important feature that docker swarm clusters lack is auto escalability. This does not mean that it cannot be achieved by other means, but there are other orchestrating solutions like k8 or AWS ECS that can can do it "out of the box". On this case an auto escalating solution could be implemented with some scripting and a monitoring tool like Zabbix.
 
@@ -110,6 +121,10 @@ After this the cluster will have an increased capcity that should help it manage
 7. Commit and push the changes. This will trigger an application redeployment.
 
 For the monitoring of the cluster nodes two approaches are available. One would be to modify the `user_data` script in terraform code to install and configure the Zabbix agent so it auto registers with the server inmediately it is created. The second option would be to use an ansible playook to do the same as part of the escaling program steps.
+
+### Application Deployment
+
+Currently when the CI/CD pipeline is executed, the `deploy.sh` script will remove and re-deploy the application. Doing this is more risky when application tests are not being done first to guarantee the proper operation of the application's new version. If the there is an issue with the new version it cannot easily be rolled back to the previous version, only by manually pushig the previous version to the git repository so the pipiline redeploys the last working version. Using swarm [rolling updates](https://docs.docker.com/engine/swarm/swarm-tutorial/rolling-update/) could be a better approach on this case as it will secuentially update all the apllication containers to the new version without deleting the previous ones, allowing for a rollback operation if needed.
 
 ### Database
 
