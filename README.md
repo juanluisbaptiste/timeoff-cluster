@@ -142,7 +142,9 @@ For the monitoring of the cluster nodes two approaches are available. One would 
 
 ### Application Deployment
 
-Currently when the CI/CD pipeline is executed, the `deploy.sh` script will remove and re-deploy the application. Doing this is more risky when application tests are not being done first to guarantee the proper operation of the application's new version. If the there is an issue with the new version it cannot easily be rolled back to the previous version, only by manually pushig the previous version to the git repository so the pipiline redeploys the last working version. Using swarm [rolling updates](https://docs.docker.com/engine/swarm/swarm-tutorial/rolling-update/) could be a better approach on this case as it will secuentially update all the apllication containers to the new version without deleting the previous ones, allowing for a rollback operation if needed.
+Currently when the CI/CD pipeline is executed, the `deploy.sh` script will remove and re-deploy the application. Doing this is more risky when application tests are not being done first to guarantee the proper operation of the application's new version. If the there is an issue with the new version it cannot easily be rolled back to the previous version, only by manually pushig the previous version to the git repository so the pipiline redeploys the last working version. 
+
+Using swarm [rolling updates](https://docs.docker.com/engine/swarm/swarm-tutorial/rolling-update/) could be a better approach on this case as it will secuentially update all the apllication containers to the new version, allowing a zero downtime deployment. Also old containers are not deleted, allowing for a rollback operation if needed.
 
 ### Database
 
