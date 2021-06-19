@@ -63,7 +63,7 @@ Terraform was selected to do the cloud provisioning in AWS. The terraform code i
 * _[swarm_cluster](https://github.com/juanluisbaptiste/timeoff-cluster/tree/master/terraform/swarm_cluster)_: this project will create a docker swarm cluster with an specified amount of manager and worker, and from an specified size (instance type) each.
 * _[efs](https://github.com/juanluisbaptiste/timeoff-cluster/tree/master/terraform/efs)_: this project will create a shared EFS filesystem inside the cluster's VPC were the application code will reside and be shared among all the worker nodes of the cluster.
 
-All of the projects use custom terraform modules to do the work. For the documentation of module usage see its README.md file of each project. Projects must be launched in the same order as the preious list, first create the elastic IP addresses, then the cluster and lastly the EFS filesystem.
+All of the projects use custom terraform modules to do the work and their state files are stored in s3. For the documentation of module usage see its README.md file of each project. Projects must be launched in the same order as the preious list, first create the elastic IP addresses, then the cluster and lastly the EFS filesystem.
 
 ### Cluster Provisioning
 
