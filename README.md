@@ -1,6 +1,23 @@
-# Timeoff application swarm cluster
+# Timeoff Application Swarm Cluster
 
-This repository contains the code to deploy the infrastructure needed to deploy timeoff-management application in AWS.
+This repository contains the code to deploy the infrastructure needed to deploy and manage [timeoff-management application](https://github.com/timeoff-management/timeoff-management-application) in AWS.
+
+Table of Contents
+=================
+
+   * [Timeoff Application Swarm Cluster](#timeoff-application-swarm-cluster)
+      * [Introduction](#introduction)
+      * [Description of the Work Done](#description-of-the-work-done)
+         * [Architecture](#architecture)
+         * [Infrastructure as Code](#infrastructure-as-code)
+         * [Cluster Provisioning](#cluster-provisioning)
+         * [Continious Integration &amp; Deployment](#continious-integration--deployment)
+      * [Further Work](#further-work)
+         * [Application Availability](#application-availability)
+         * [Auto Escalaility](#auto-escalaility)
+         * [Application Deployment](#application-deployment)
+         * [Database](#database)
+
 
 ## Introduction
 
