@@ -1,16 +1,16 @@
 ---
-- name: "Swarm cluster provisioning for environment -> {{ env|upper }} - AWS Profile -> {{ aws_profile }}"
-  hosts:  docker_engine
-  become: yes
-  become_user: root
-  roles:
-    - base
-    - atosatto.docker-swarm
+# - name: "Swarm cluster provisioning for environment -> {{ env|upper }} - AWS Profile -> {{ aws_profile }}"
+#   hosts:  docker_engine
+#   become: yes
+#   become_user: root
+#   roles:
+#     - base
+#     - atosatto.docker-swarm
 
-  vars_files:
-    - vars/deploy_swarm.yml
+#   vars_files:
+#     - vars/deploy_swarm.yml
 
-  tasks:
+  # tasks:
     # To avoid instances to start swaping when memory is available
     # https://success.mirantis.com/article/node-using-swap-memory-instead-of-host-memory
     - name: Set sysctl vm.swapiness to 0
@@ -27,3 +27,13 @@
         state: present
       tags:
         - set_sysctl_settings
+    - name: Do base provisioning
+      include_role:
+        name: "base"
+      tags:
+        - provision_ase
+    - name: Configure swarm cluster
+      include_role:
+        name: "atosatto.docker-swarm"
+      tags:
+        - configure_swarm_cluster

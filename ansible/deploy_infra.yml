@@ -1,13 +1,13 @@
 ---
-- name: "Provisioning docker infraestructure services for environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
-  hosts: docker_engine
-  become: yes
-  become_user: root
-  vars_files:
-    - vars/deploy_swarm.yml
-    - vars/deploy_infra.yml
+# - name: "Provisioning docker infraestructure services for environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
+#   hosts: docker_engine
+#   become: yes
+#   become_user: root
+#   vars_files:
+#     - vars/deploy_swarm.yml
+#     - vars/deploy_infra.yml
 
-  tasks:
+#   tasks:
     - name: Create traefik overlay network (traefik_proxy)
       docker_network:
         name: "traefik_proxy"

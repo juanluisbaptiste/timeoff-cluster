@@ -1,14 +1,14 @@
 ---
-- name: "Configure EFS access for cluster nodes for environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
-  hosts: docker_engine
-  become: yes
-  become_user: root
-  vars_files:
-    - vars/deploy_swarm.yml
-    - vars/configure_efs.yml
-    - vars/aws.yml
+# - name: "Configure EFS access for cluster nodes for environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
+#   hosts: docker_engine
+#   become: yes
+#   become_user: root
+#   vars_files:
+#     - vars/deploy_swarm.yml
+#     - vars/configure_efs.yml
+#     - vars/aws.yml
 
-  tasks:
+#   tasks:
   - name: "Ensure mount directory exists: {{ efs_mount_dir }}"
     file:
       path: "{{ efs_mount_dir }}"

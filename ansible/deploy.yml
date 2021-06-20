@@ -1,0 +1,24 @@
+---
+- name: "Provisioning environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
+  hosts: docker_engine
+  become: yes
+  become_user: root
+  vars_files:
+    - vars/deploy_swarm.yml
+    - vars/deploy_infra.yml
+    - vars/configure_efs.yml
+    - vars/aws.yml
+
+  tasks:
+    - include: deploy_swarm.yml
+      tags:
+        - deploy_swarm
+    - include: configure_efs.yml
+      tags:
+        - configure_efs
+    - include: deploy_infra.yml
+      tags:
+        - deploy_infra
+    - include: provision_apps.yml
+      tags:
+        - provision_apps

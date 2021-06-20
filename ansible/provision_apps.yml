@@ -1,13 +1,13 @@
 ---
-- name: "Copy configuration files for applications in environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
-  hosts: docker_swarm_manager
-  become: yes
-  become_user: root
-  vars_files:
-    - vars/deploy_swarm.yml
-    - vars/configure_efs.yml
+# - name: "Copy configuration files for applications in environment -> {{ env|upper }} - Profile AWS -> {{ aws_profile }}"
+#   hosts: docker_swarm_manager
+#   become: yes
+#   become_user: root
+#   vars_files:
+#     - vars/deploy_swarm.yml
+#     - vars/configure_efs.yml
 
-  tasks:
+#   tasks:
   - name: "Ensure configuration directory exists: {{ efs_mount_dir }}/sites/timeoff/"
     file:
       path: "{{ efs_mount_dir }}/sites/timeoff/"
