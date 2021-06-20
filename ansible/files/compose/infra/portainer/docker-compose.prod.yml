@@ -16,7 +16,6 @@ services:
       - traefik_proxy
     deploy:
       mode: global
-#      endpoint_mode: dnsrr
       placement:
         constraints: [node.platform.os == linux]
       update_config:
@@ -29,7 +28,6 @@ services:
       image: portainer/portainer-ce
       deploy:
         replicas: 1
-        # endpoint_mode: dnsrr
         placement:
           constraints:
             - node.role == manager

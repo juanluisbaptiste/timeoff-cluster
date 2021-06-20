@@ -36,7 +36,7 @@ services:
       - "/var/compose/infra/drone/volumes/drone:/data"
       - '/etc/localtime:/etc/localtime:ro'
 
-  drone-agent-bb:
+  drone-agent:
     image: drone/agent:1
     deploy:
       replicas: 1
@@ -59,7 +59,7 @@ services:
     command: agent
     restart: always
     depends_on:
-      - drone-bb
+      - drone
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '/etc/localtime:/etc/localtime:ro'
