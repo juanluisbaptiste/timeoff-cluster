@@ -18,10 +18,11 @@
   - name: Copy configuration files
     copy:
       src: files/timeoff/config
-      dest: "{{ efs_mount_dir }}/sites/timeoff/"
+      dest: "{{ efs_mount_dir }}/sites/timeoff"
       # owner: "{{ ansible_ssh_user }}"
       owner: 100
       group: "{{ ansible_ssh_user }}"
+      force: yes
       # mode: 0755
 
   # - name: "Copy deploy.sh script to /home/{{ ansible_ssh_user  }}"
