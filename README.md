@@ -12,8 +12,9 @@ Table of Contents
          * [Infrastructure as Code](#infrastructure-as-code)
          * [Cluster Provisioning](#cluster-provisioning)
          * [Continious Integration &amp; Deployment](#continious-integration--deployment)
-      * [Further Work](#further-work)
          * [Application Availability](#application-availability)
+      * [Further Work](#further-work)
+         * [Application Availability](#application-availability-1)
          * [Auto Escalaility](#auto-escalaility)
          * [Application Deployment](#application-deployment)
          * [Database](#database)
@@ -75,12 +76,13 @@ For cluster administration and debugging [portainer](https://www.portainer.io/) 
 
 These are the ansible playbooks:
 
+* _deploy.yml_: Main playbook that include the bellow playbooks to do all the provisioning
 * _deploy_swarm_: This playbook will provision the ec2 instances, installing all the needed software and configuring the swarm cluster.
 * _configure_efs_: This playbook will configure each ec2 instance to mount the EFS filesystem at boot.
 * _deploy_infra_: This playook will install the cluster infrastructure services, like traefik and portainer.
 * _provision_apps_: This playbook will copy the application configuration files into a directory in the EFS filesystem.
 
-All of the playbooks have to be run in the same order as the previous list.
+Playbooks can be run individually using tags.
 
 ### Continious Integration & Deployment
 
@@ -97,6 +99,11 @@ The pipeline workflow is like this:
 2. image build job will clone the [timeoff management application fork](https://github.com/juanluisbaptiste/timeoff-management-application), build the image and push it to docker hub using a native drone plugin.
 3. If the previous job is successfull the de deployment job will connect vía ssh and run the `deploy.sh` script. This script will pull the new image, remove the current deployed version of the application and redeploy the new version.
 
+### Application Availability
+
+The application is dpeloyed on the cluster with multiple replicas that run on different worker nodes to increase the application availability. Also hardware resources like the amount of memory or CPU's it can use can be controlled through the `stack.yml` file. This is used by the orchestrator to choose a node with enough resources to run the application.
+
+Access to the application is done through a load balancer (traefik). The configuration is done using docker labels that define the hostname the application answers to and the port it listens on. Other options can be specified, like doing redirects, cookie handling, among others. Also health checks can also be configured so the load balancer can query the state of the container, and avoid sending traffic to it if it is not available.
 
 ## Further Work
 
