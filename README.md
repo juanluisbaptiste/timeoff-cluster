@@ -77,10 +77,10 @@ For cluster administration and debugging [portainer](https://www.portainer.io/) 
 These are the ansible playbooks:
 
 * _deploy.yml_: Main playbook that include the bellow playbooks to do all the provisioning
-* _deploy_swarm_: This playbook will provision the ec2 instances, installing all the needed software and configuring the swarm cluster.
-* _configure_efs_: This playbook will configure each ec2 instance to mount the EFS filesystem at boot.
-* _deploy_infra_: This playook will install the cluster infrastructure services, like traefik and portainer.
-* _provision_apps_: This playbook will copy the application configuration files into a directory in the EFS filesystem.
+* _deploy_swarm.yml_: This playbook will provision the ec2 instances, installing all the needed software and configuring the swarm cluster.
+* _configure_efs.yml_: This playbook will configure each ec2 instance to mount the EFS filesystem at boot.
+* _deploy_infra.yml_: This playook will install the cluster infrastructure services, like traefik and portainer.
+* _provision_apps.yml_: This playbook will copy the application configuration files into a directory in the EFS filesystem.
 
 Playbooks can be run individually using tags.
 
