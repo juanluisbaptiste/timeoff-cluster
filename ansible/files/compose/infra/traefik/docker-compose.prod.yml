@@ -51,7 +51,7 @@ services:
         - "traefik.http.routers.traefik.rule=Host(`traefik.juanbaptiste.tech`)"
         - "traefik.http.routers.traefik.service=api@internal"
         - "traefik.http.routers.traefik.middlewares=auth"
-        - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$QHDPJ4w0$$Ybhi/JJYchLNX8qFCvl780"
+        - "traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$05$$2GjroXW32Yl5AVPSzquyfeBG0VhWP0PghI3cWQfTxLinm8nZhNQ.G"
         # Letsencrypt
         - "traefik.http.routers.traefik.tls.certresolver=le"
         - "traefik.http.routers.traefik.entrypoints=https"
