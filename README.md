@@ -41,7 +41,7 @@ The swarm cluster uses a single manager node with multiple workers that handle t
 When the infrastructure is up, the application and additional services are available at the following adresses:
 
 * Timeoff management application: https://timeoff.juanbaptiste.tech/
-* Drone.io CI/CD: https://ci.juanbaptiste.tech/
+* Drone.io CI/CD: https://drone.juanbaptiste.tech/
 * Traefik dashboard: https://traefik.juanbaptiste.tech/
 * Portainer dashboard: https://portainer.juanbaptiste.tech/
 
